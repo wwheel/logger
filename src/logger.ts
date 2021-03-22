@@ -1,5 +1,8 @@
+import { LoggerLevel } from './logger-level';
+
 export class Logger
 {
+  static prefix: string      = null;
   static levels              = ['all', 'log', 'debug', 'info', 'warning', 'error', 'none'];
   static levelsCategories    = { all: true, none: false };
   static enabledStackTrace   = true;
@@ -9,6 +12,11 @@ export class Logger
   static setLevelsCategories(levelsCategories): void
   {
     this.levelsCategories = levelsCategories;
+  }
+
+  static setPrefix(prefix: string): void
+  {
+    this.prefix = prefix;
   }
 
   static enable(enable): void
@@ -21,7 +29,13 @@ export class Logger
     this.enabledStackTrace = enable;
   }
 
-  static log(...rest: any[]): void
+  static error = (...rest: any[]) => Logger.printLog(LoggerLevel.Error, ...rest);
+  static warning = (...rest: any[]) => Logger.printLog(LoggerLevel.Warning, ...rest);
+  static debug = (...rest: any[]) => Logger.printLog(LoggerLevel.Debug, ...rest);
+  static info = (...rest: any[]) => Logger.printLog(LoggerLevel.Info, ...rest);
+  static log = (...rest: any[]) => Logger.printLog(LoggerLevel.Log, ...rest);
+
+  static printLog(...rest: any[]): void
   {
     if (this.detectSlowBrowsers)
     {
@@ -156,10 +170,18 @@ export class Logger
   private static _getParams(args): any[]
   {
     const params = [];
+    const prefix = typeof this.prefix === 'string' ? this.prefix + ':' : '';
     let i;
     params.push('' + this._getCurrentTime() + ' - ');
-    params.push('[' + args[0] + ']');
-    params.push('[' + args[1] + ']');
+    params.push('[' + prefix + args[0] + ']');
+    if (typeof args[1] === 'string')
+    {
+      params.push('[' + args[1] + ']');
+    }
+    else
+    {
+      params.push(args[1]);
+    }
     if (args && (args.length > 2))
     {
       for (i = 2; i < args.length; i++)

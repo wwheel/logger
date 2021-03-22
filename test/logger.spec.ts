@@ -2,6 +2,11 @@ import { Logger } from '../src/logger';
 
 test('Logger', () =>
 {
-  Logger.log('info', 'info')
+  const opj = {
+    prop: 'value'
+  };
+  Logger.setPrefix('widget');
+  Logger.info(opj);
+  // Logger.info(opj);
 });
 
