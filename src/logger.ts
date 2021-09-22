@@ -8,10 +8,16 @@ export class Logger
   static enabledStackTrace   = true;
   static detectSlowBrowsers  = true;
   static slowBrowserDetected = false;
+  static handler: (...rest: any[]) => void = null;
 
   static setLevelsCategories(levelsCategories): void
   {
     this.levelsCategories = levelsCategories;
+  }
+
+  static setHandler(handler: (...rest: any[]) => void): void
+  {
+    this.handler = handler;
   }
 
   static setPrefix(prefix: string): void
@@ -29,14 +35,19 @@ export class Logger
     this.enabledStackTrace = enable;
   }
 
-  static error = (...rest: any[]) => Logger.printLog(LoggerLevel.Error, ...rest);
+  static error   = (...rest: any[]) => Logger.printLog(LoggerLevel.Error, ...rest);
   static warning = (...rest: any[]) => Logger.printLog(LoggerLevel.Warning, ...rest);
-  static debug = (...rest: any[]) => Logger.printLog(LoggerLevel.Debug, ...rest);
-  static info = (...rest: any[]) => Logger.printLog(LoggerLevel.Info, ...rest);
-  static log = (...rest: any[]) => Logger.printLog(LoggerLevel.Log, ...rest);
+  static debug   = (...rest: any[]) => Logger.printLog(LoggerLevel.Debug, ...rest);
+  static info    = (...rest: any[]) => Logger.printLog(LoggerLevel.Info, ...rest);
+  static log     = (...rest: any[]) => Logger.printLog(LoggerLevel.Log, ...rest);
 
   static printLog(...rest: any[]): void
   {
+    if (typeof this.handler === 'function')
+    {
+      this.handler(...rest);
+    }
+
     if (this.detectSlowBrowsers)
     {
       if (!console.log['apply'] && !this.slowBrowserDetected)
